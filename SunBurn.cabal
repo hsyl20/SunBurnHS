@@ -1,0 +1,32 @@
+name:                SunBurn
+version:             0.1.0.0
+-- synopsis:            
+-- description:         
+license:             GPL-3
+license-file:        LICENSE
+author:              Sylvain HENRY
+maintainer:          hsyl20@gmail.com
+category:            Graphics
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+   exposed-modules:
+      Graphics.SunBurn.Scene
+      Graphics.SunBurn.Objects
+
+   build-depends:
+      base >=4.8 && <4.9
+
+   hs-source-dirs: src/lib
+   ghc-options: -Wall
+   default-language:    Haskell2010
+
+executable Demo
+   main-is: Demo.hs
+   hs-source-dirs: src/apps
+   ghc-options: -Wall
+   default-language:    Haskell2010
+   build-depends: 
+      base,
+      SunBurn
