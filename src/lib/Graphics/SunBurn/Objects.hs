@@ -156,9 +156,11 @@ renderPixel scn vp zw = curry trace
          Just _  -> RGBColor 255 0 0
 
 
+defaultColorToPixel :: Color -> PixelRGBA8
+defaultColorToPixel (RGBColor r g b) = PixelRGBA8 (fromIntegral r) (fromIntegral g) (fromIntegral b) 255
+
 renderPng :: Scene -> ViewPlane -> Double -> String -> IO ()
-renderPng scn vp zw path = writePng path $ generateImage (\x y -> toPixel $ renderPixel scn vp zw x y) w h
+renderPng scn vp zw path = writePng path $ generateImage (\x y -> defaultColorToPixel $ renderPixel scn vp zw x y) w h
    where 
       w = vpHorizontalResolution vp
       h = vpVerticalResolution vp
-      toPixel (RGBColor r g b) = PixelRGB8 (fromIntegral r) (fromIntegral g) (fromIntegral b)
