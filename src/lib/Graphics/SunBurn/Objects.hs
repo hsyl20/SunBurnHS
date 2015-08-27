@@ -10,14 +10,18 @@ module Graphics.SunBurn.Objects
    , Hittable (..)
    , Object(..)
    , ViewPlane(..)
-   , renderScene
    , Scene(..)
+   , renderScene
+   , renderPixel
+   , renderPng
    )
    where
 
 import Data.Maybe (mapMaybe)
 import Data.List (sortBy)
 import Data.Ord (comparing)
+
+import Codec.Picture
 
 data Vector3D = Vector3D Double Double Double deriving (Show)
 
@@ -134,8 +138,13 @@ traceMin os ray = headMaybe . sortBy (comparing hitDistance) . mapMaybe hit' $ o
 
 
 renderScene :: Scene -> ViewPlane -> Double -> [[Color]]
-renderScene scn vp zw = 
-      fmap trace <$> [ [ (c,r) | c <- [0 .. vpHorizontalResolution vp - 1]] | r <- [0 .. vpVerticalResolution vp - 1]]
+renderScene scn vp zw = fmap render <$> pxs
+   where
+      render = uncurry (renderPixel scn vp zw)
+      pxs = [ [ (c,r) | c <- [0 .. vpHorizontalResolution vp - 1]] | r <- [0 .. vpVerticalResolution vp - 1]]
+
+renderPixel :: Scene -> ViewPlane -> Double -> Int -> Int -> Color
+renderPixel scn vp zw = curry trace
    where
       makeRay c r = Ray (Vector3D x y zw) (Vector3D 0.0 0.0 (-1.0))
          where
@@ -145,3 +154,11 @@ renderScene scn vp zw =
       trace (c,r) = case traceMin (sceneObjects scn) (makeRay c r) of
          Nothing -> sceneBackgroundColor scn
          Just _  -> RGBColor 255 0 0
+
+
+renderPng :: Scene -> ViewPlane -> Double -> String -> IO ()
+renderPng scn vp zw path = writePng path $ generateImage (\x y -> toPixel $ renderPixel scn vp zw x y) w h
+   where 
+      w = vpHorizontalResolution vp
+      h = vpVerticalResolution vp
+      toPixel (RGBColor r g b) = PixelRGB8 (fromIntegral r) (fromIntegral g) (fromIntegral b)

@@ -16,7 +16,8 @@ library
       Graphics.SunBurn.Objects
 
    build-depends:
-      base >=4.8 && <4.9
+        base >=4.8 && <4.9
+      , JuicyPixels == 3.2.*
 
    hs-source-dirs: src/lib
    ghc-options: -Wall
